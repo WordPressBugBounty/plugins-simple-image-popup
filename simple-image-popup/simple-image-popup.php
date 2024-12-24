@@ -8,7 +8,7 @@
  * Text Domain: simple-image-popup
  * License: GPL v2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
- * Version: 2.5.3
+ * Version: 2.5.8
  */
 
 // Exit if accessed directly

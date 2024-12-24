@@ -1,20 +1,18 @@
 === Simple Image Popup ===
-
-Contributors: mrdigital  
-Plugin Name: Simple Image Popup  
-Tags: image, popup, simple, lightbox, alert, image popup, conditional display, accessibility  
-Author URI: https://www.mrdigital.com.au  
-Author: Sean Freitas  
-Requires at least: 5.6  
-Tested up to: 6.1.1  
-Requires PHP: 5.6  
-Stable tag: 2.5.3  
-License: GPLv2 or later  
+Contributors: mrdigital
+Tags: popup, image, lightbox, conditional, accessibility
+Author URI: https://www.mrdigital.com.au
+Author: Sean Freitas
+Requires at least: 5.6
+Tested up to: 6.7.1
+Requires PHP: 7.4
+Stable tag: 2.5.8
+License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-== Description ==
-
 A simple way to show a popup image on your website with various enhancements including conditional display and accessibility features.
+
+== Description ==
 
 Use this plugin to display an image popup for promotions, alerts, or messages. Key features include:
 - Simple activation/deactivation of the popup.
@@ -48,6 +46,10 @@ Enable "Conditional Display" in the plugin settings, then select the posts or pa
 Yes, with the latest version, the popup is accessible and can be closed by pressing the ESC key, ensuring better accessibility and user experience.
 
 == Changelog ==
+
+= 2.5.6 =
+* Updated to include new dispatch date message.
+* Minor bug fixes and performance improvements.
 
 = 2.5.3 =
 * Added JavaScript and styling to only show the "Select Posts/Pages" field if "Conditional Display" is enabled.

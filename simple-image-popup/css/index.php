@@ -1,3 +1,5 @@
 <?php
 
-die('You should not be here');
+if (! defined('ABSPATH')) {
+    exit;
+}

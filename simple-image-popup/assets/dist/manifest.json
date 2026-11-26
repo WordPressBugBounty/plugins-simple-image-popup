@@ -1,0 +1,17 @@
+{
+  "resources/js/admin/main.js": {
+    "file": "assets/admin-D8kgxDNq.js",
+    "name": "admin",
+    "src": "resources/js/admin/main.js",
+    "isEntry": true,
+    "css": [
+      "assets/admin-Cxto5P_J.css"
+    ]
+  },
+  "resources/js/frontend.js": {
+    "file": "assets/frontend-fV3XkMwB.js",
+    "name": "frontend",
+    "src": "resources/js/frontend.js",
+    "isEntry": true
+  }
+}

@@ -1,0 +1,752 @@
+/*
+ * Simple Image Popup admin.
+ * Sits inside wp-admin, so it borrows the admin colour scheme and control sizes
+ * rather than inventing its own. Colours below are the WordPress core palette.
+ */
+.sip-admin {
+  --sip-accent: var(--wp-admin-theme-color, #2271b1);
+  --sip-accent-soft: color-mix(in srgb, var(--sip-accent) 8%, #fff);
+  --sip-text: #1e1e1e;
+  --sip-muted: #50575e;
+  --sip-border: #dcdcde;
+  --sip-border-strong: #949494;
+  --sip-surface: #fff;
+  --sip-subtle: #f6f7f7;
+  --sip-success: #007017;
+  --sip-success-bg: #edfaef;
+  --sip-warning: #8a5c00;
+  --sip-warning-bg: #fcf9e8;
+  --sip-warning-border: #f0c33c;
+  --sip-error: #b32d2e;
+  --sip-error-bg: #fcf0f1;
+  --sip-radius: 4px;
+  --sip-sticky-top: 32px;
+
+  color: var(--sip-text);
+  font-size: 13px;
+  line-height: 1.5;
+  max-width: 1280px;
+}
+
+.sip-admin ::selection {
+  background: color-mix(in srgb, var(--sip-accent) 22%, #fff);
+}
+
+.sip-admin :focus-visible {
+  outline: 2px solid var(--sip-accent);
+  outline-offset: 2px;
+}
+
+/* Page header: matches the core list-screen pattern (title + "Add" action). */
+.sip-admin__page-header {
+  margin-bottom: 16px;
+}
+
+.sip-admin .page-title-action {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* Two-pane layout: popup list, then editor. */
+.sip-admin__layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+  scroll-margin-top: calc(var(--sip-sticky-top) + 16px);
+}
+
+/* Popup list */
+.sip-admin__sidebar {
+  position: sticky;
+  top: calc(var(--sip-sticky-top) + 16px);
+  background: var(--sip-surface);
+  border: 1px solid var(--sip-border);
+  border-radius: var(--sip-radius);
+  padding: 16px 12px 12px;
+  max-height: calc(100vh - var(--sip-sticky-top) - 32px);
+  overflow-y: auto;
+}
+
+.sip-admin__sidebar-heading {
+  margin: 0 4px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.sip-admin__count {
+  color: var(--sip-muted);
+  font-weight: 400;
+}
+
+.sip-admin__empty {
+  margin: 0 4px 12px;
+  color: var(--sip-muted);
+}
+
+.sip-admin__list {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sip-admin__list li {
+  margin: 0;
+}
+
+.sip-admin__popup-item {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  min-height: 56px;
+  padding: 8px;
+  border: 1px solid transparent;
+  border-radius: var(--sip-radius);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 150ms ease-out, border-color 150ms ease-out;
+}
+
+.sip-admin__popup-item:hover {
+  background: var(--sip-subtle);
+}
+
+.sip-admin__popup-item.is-active {
+  background: var(--sip-accent-soft);
+  border-color: var(--sip-accent);
+}
+
+.sip-admin__thumb {
+  display: block;
+  width: 44px;
+  height: 44px;
+  overflow: hidden;
+  border-radius: 2px;
+  background-color: var(--sip-subtle);
+  background-image: linear-gradient(45deg, #ececec 25%, transparent 25%, transparent 75%, #ececec 75%),
+    linear-gradient(45deg, #ececec 25%, transparent 25%, transparent 75%, #ececec 75%);
+  background-position: 0 0, 5px 5px;
+  background-size: 10px 10px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
+.sip-admin__thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sip-admin__popup-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sip-admin__popup-title {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sip-admin__popup-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  color: var(--sip-muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Status: dot + words, so it never relies on colour alone. */
+.sip-status {
+  display: inline-flex;
+  gap: 6px;
+  align-items: flex-start;
+  margin: 0;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.sip-status::before {
+  content: '';
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin-top: calc(0.7em - 4px);
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.sip-status--live {
+  color: var(--sip-success);
+}
+
+.sip-status--off {
+  color: var(--sip-muted);
+}
+
+.sip-status--off::before {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px currentColor;
+}
+
+.sip-status--warning {
+  color: var(--sip-warning);
+}
+
+.sip-status--large {
+  font-size: 13px;
+}
+
+/* Editor */
+.sip-admin__editor {
+  display: grid;
+  gap: 16px;
+  max-width: 860px;
+  min-width: 0;
+}
+
+.sip-admin__toolbar {
+  position: sticky;
+  top: var(--sip-sticky-top);
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--sip-surface);
+  border: 1px solid var(--sip-border);
+  border-radius: var(--sip-radius);
+  box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.08);
+}
+
+.sip-admin__toolbar-title {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sip-admin__toolbar-title h2 {
+  margin: 0;
+  overflow: hidden;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sip-admin__toolbar-title h2:focus {
+  outline: none;
+}
+
+.sip-admin__toolbar-title h2:focus-visible {
+  outline: 2px solid var(--sip-accent);
+}
+
+.sip-admin__toolbar-actions {
+  display: flex;
+  flex: none;
+  gap: 16px;
+  align-items: center;
+}
+
+.sip-admin__dirty {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  color: var(--sip-muted);
+}
+
+.sip-admin__dirty::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--sip-warning-border);
+}
+
+/* Messages */
+.sip-admin__messages:not(:has(p)) {
+  display: none;
+}
+
+.sip-admin__messages {
+  display: grid;
+  gap: 8px;
+}
+
+.sip-message {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid;
+  border-radius: var(--sip-radius);
+}
+
+.sip-message--success {
+  background: var(--sip-success-bg);
+  border-color: #b8e6bf;
+  color: var(--sip-success);
+}
+
+.sip-message--error {
+  background: var(--sip-error-bg);
+  border-color: #facfd2;
+  color: #8a2424;
+}
+
+.sip-message--warning {
+  background: var(--sip-warning-bg);
+  border-color: var(--sip-warning-border);
+  color: #614200;
+}
+
+.sip-message--info {
+  background: var(--sip-accent-soft);
+  border-color: color-mix(in srgb, var(--sip-accent) 30%, #fff);
+  color: var(--sip-text);
+}
+
+/* Panels */
+.sip-panel {
+  padding: 20px 24px 8px;
+  background: var(--sip-surface);
+  border: 1px solid var(--sip-border);
+  border-radius: var(--sip-radius);
+}
+
+.sip-panel__heading {
+  margin: 0 0 20px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* Fields */
+.sip-field {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  min-width: 0;
+  margin: 0 0 20px;
+  padding: 0;
+  border: 0;
+}
+
+.sip-field--nested {
+  margin: 12px 0 0;
+}
+
+.sip-field__label {
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+legend.sip-field__label {
+  margin-bottom: 6px;
+}
+
+.sip-field__label--secondary {
+  font-weight: 400;
+}
+
+.sip-field__required,
+.sip-field__optional {
+  color: var(--sip-muted);
+  font-weight: 400;
+}
+
+.sip-field__help {
+  max-width: 65ch;
+  margin: 0;
+  color: var(--sip-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.sip-field__help--indented {
+  padding-left: 28px;
+}
+
+.sip-field__error {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  margin: 0;
+  color: var(--sip-error);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.sip-field__error::before {
+  content: '!';
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--sip-error);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  transform: translateY(2px);
+}
+
+.sip-admin input[type='text'],
+.sip-admin input[type='url'],
+.sip-admin input[type='search'],
+.sip-admin input[type='number'],
+.sip-admin select {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+.sip-field__input--medium {
+  max-width: 360px !important;
+}
+
+.sip-admin input::placeholder {
+  color: #757575;
+}
+
+.sip-field.has-error > input,
+.sip-field.has-error .sip-unit input,
+.sip-field.has-error #sip-image-url {
+  border-color: var(--sip-error);
+  box-shadow: 0 0 0 1px var(--sip-error);
+}
+
+.sip-field-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 24px;
+}
+
+.sip-field-row--thirds {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.sip-field--check {
+  padding-top: 32px;
+}
+
+/* Checkbox / radio rows: generous hit area, label wraps under itself. */
+.sip-check {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.sip-check input[type='checkbox'],
+.sip-check input[type='radio'] {
+  flex: none;
+  margin: 2px 0 0;
+}
+
+.sip-check label {
+  padding-top: 1px;
+  cursor: pointer;
+}
+
+.sip-choices {
+  display: grid;
+  gap: 10px;
+}
+
+/* Number inputs with a unit after them */
+.sip-unit {
+  display: flex;
+  align-items: center;
+  max-width: 200px;
+}
+
+.sip-unit input[type='number'] {
+  min-width: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.sip-unit__suffix {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  background: var(--sip-subtle);
+  border: 1px solid var(--sip-border-strong);
+  border-left: 0;
+  border-radius: 0 2px 2px 0;
+  color: var(--sip-muted);
+  white-space: nowrap;
+}
+
+/* Image picker */
+.sip-image {
+  display: grid;
+  grid-template-columns: minmax(0, 240px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.sip-image__preview {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 1px solid var(--sip-border);
+  border-radius: var(--sip-radius);
+  background-color: var(--sip-subtle);
+  background-image: linear-gradient(45deg, #ececec 25%, transparent 25%, transparent 75%, #ececec 75%),
+    linear-gradient(45deg, #ececec 25%, transparent 25%, transparent 75%, #ececec 75%);
+  background-position: 0 0, 8px 8px;
+  background-size: 16px 16px;
+}
+
+.sip-image__preview img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.sip-image__preview.is-empty {
+  border-style: dashed;
+  border-color: var(--sip-border-strong);
+  background-image: none;
+}
+
+.sip-image__placeholder {
+  padding: 16px;
+  color: var(--sip-muted);
+  text-align: center;
+}
+
+.sip-image__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+}
+
+/* Targeting */
+.sip-targets {
+  margin: -4px 0 20px;
+  padding: 16px;
+  background: var(--sip-subtle);
+  border: 1px solid var(--sip-border);
+  border-radius: var(--sip-radius);
+}
+
+.sip-targets .sip-field {
+  margin-bottom: 12px;
+}
+
+.sip-search-row {
+  display: flex;
+  gap: 8px;
+  max-width: 520px;
+}
+
+.sip-search-row .button {
+  flex: none;
+}
+
+.sip-results,
+.sip-targets__list {
+  margin: 0 0 16px;
+  padding: 0;
+  overflow: hidden;
+  list-style: none;
+  background: var(--sip-surface);
+  border: 1px solid var(--sip-border);
+  border-radius: var(--sip-radius);
+}
+
+.sip-results {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.sip-results__item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  margin: 0;
+  padding: 6px 12px;
+  border-top: 1px solid var(--sip-border);
+}
+
+.sip-results__item:first-child {
+  border-top: 0;
+}
+
+.sip-results__title {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.sip-type {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 2px;
+  background: var(--sip-subtle);
+  color: var(--sip-muted);
+  font-size: 11px;
+  line-height: 18px;
+  vertical-align: 1px;
+}
+
+.sip-targets__heading {
+  margin: 4px 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.sip-targets .sip-message--warning {
+  margin-bottom: 0;
+}
+
+.sip-targets__list {
+  margin-bottom: 0;
+}
+
+/* Footer: the destructive action lives away from Save. */
+.sip-admin__footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 4px 0;
+}
+
+.sip-admin__footer-meta {
+  margin: 0;
+  color: var(--sip-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.sip-admin .button-link-delete {
+  min-height: 32px;
+  padding: 0 2px;
+}
+
+.sip-admin .button-link-delete:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Below this width the admin menu is narrower; stack the list above the editor. */
+@media (max-width: 1100px) {
+  .sip-admin__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sip-admin__sidebar {
+    position: static;
+    max-height: 340px;
+  }
+
+  .sip-admin__list {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+
+  .sip-admin__editor {
+    max-width: none;
+  }
+}
+
+@media (max-width: 782px) {
+  .sip-admin {
+    --sip-sticky-top: 46px;
+  }
+
+  .sip-field-row,
+  .sip-field-row--thirds {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sip-field--check {
+    padding-top: 0;
+  }
+
+  .sip-image {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sip-image__preview {
+    max-width: 320px;
+  }
+
+  .sip-panel {
+    padding: 16px 16px 4px;
+  }
+
+  .sip-unit {
+    max-width: none;
+  }
+}
+
+/* The admin bar stops being fixed on small phones. */
+@media (max-width: 600px) {
+  .sip-admin__toolbar {
+    top: 0;
+    flex-wrap: nowrap;
+    gap: 12px;
+    padding: 10px 12px;
+  }
+
+  .sip-admin__toolbar-title h2 {
+    font-size: 15px;
+  }
+
+  .sip-admin__toolbar-title .sip-status {
+    font-size: 12px;
+  }
+
+  .sip-admin__toolbar-actions {
+    gap: 10px;
+  }
+
+  /* Keep the unsaved dot visible; the words stay available to screen readers. */
+  .sip-admin__dirty-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .sip-admin__dirty::before {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sip-admin * {
+    transition: none !important;
+  }
+}
